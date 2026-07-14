@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventure Quest Game</title>
+    
+    <!-- Font Awesome Icons Library for professional UI icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 
+    ===============================================
+    STYLES (Embedded for self-contained deployment)
+    =============================================== 
+    -->
+    <style>
+        /* ============= BASE STYLES ============= */
+        /* Modern gradient background for immersive gaming feel */
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
+        }
+        
+        /* Central container with dark overlay for content focus - now wider */
+        .game-container {
+            max-width: 95vw;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        /* ============= HEADER SECTION ============= */
+        /* Centered title area for game branding */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        /* ============= STATS PANELS ============= */
+        /* Responsive grid layout for game statistics */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        /* Individual stat cards with glowing border effect */
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #00ffff;
+        }
+        
+        /* Player character panel with green tint for friendly identification */
+        .character-panel {
+            background: rgba(0, 255, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        /* ============= GAME AREA ============= */
+        /* Main story/narrative display area */
+        .game-area {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+        
+        /* ============= CONTROLS ============= */
+        /* Flexible button layout for various screen sizes */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        /* Interactive buttons with hover effects for better UX */
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        /* Hover state for visual feedback */
+        button:hover {
+            background: linear-gradient(45deg, #ff5252, #ff7575);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* Disabled state for context-inappropriate actions */
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* ============= CHOICE & RISK BUTTONS ============= */
+        /* Choice buttons for path decisions */
+        .choice-btn.left-choice {
+            background: linear-gradient(45deg, #4a90e2, #5ba0f2);
+        }
+        
+        .choice-btn.right-choice {
+            background: linear-gradient(45deg, #f5a623, #ffb347);
+        }
+        
+        .choice-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Risk buttons for high-stakes decisions */
+        .risk-btn.dangerous {
+            background: linear-gradient(45deg, #d32f2f, #f44336);
+            border: 2px solid #ff5722;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .risk-btn.safe {
+            background: linear-gradient(45deg, #388e3c, #4caf50);
+        }
+        
+        .risk-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+        
+        /* Pulse animation for dangerous choices */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+        }
+        
+        /* ============= VICTORY SHARE BUTTON ============= */
+        .victory-share-btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e) !important;
+            color: #333 !important;
+            font-weight: bold;
+            border: 3px solid #ffb300;
+            animation: victoryGlow 2s infinite;
+            font-size: 16px;
+            padding: 15px 25px;
+        }
+        
+        .victory-share-btn:hover {
+            background: linear-gradient(45deg, #ffed4e, #fff176) !important;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 16px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* Victory glow animation */
+        @keyframes victoryGlow {
+            0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.8); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.7); }
+            100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.8); }
+        }
+        
+        /* ============= SHOP STYLES ============= */
+        .shop-panel {
+            background: rgba(128, 0, 128, 0.1);
+            border: 2px solid #8a2be2;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .shop-item {
+            background: rgba(75, 0, 130, 0.2);
+            border: 1px solid #9370db;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .shop-item:hover {
+            background: rgba(75, 0, 130, 0.3);
+            border-color: #ba55d3;
+            transform: translateY(-2px);
+        }
+        
+        .shop-item h4 {
+            margin: 0 0 8px 0;
+            color: #dda0dd;
+        }
+        
+        .shop-price {
+            color: #ffd700;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+        
+        .shop-btn {
+            background: linear-gradient(45deg, #8a2be2, #9370db);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .shop-btn:hover {
+            background: linear-gradient(45deg, #9370db, #ba55d3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(138, 43, 226, 0.4);
+        }
+        
+        .shop-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .shop-close {
+            background: linear-gradient(45deg, #666, #888);
+            font-size: 16px;
+            padding: 10px 20px;
+        }
+        
+        .shop-close:hover {
+            background: linear-gradient(45deg, #777, #999);
+        }
+        
+        /* ============= ENEMY PANEL ============= */
+        /* Red-tinted panel for hostile entity display */
+        .enemy-panel {
+            background: rgba(255, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none; /* Hidden by default, shown during combat */
+        }
+        
+        /* ============= PROGRESS BARS ============= */
+        /* Health and mana visual indicators */
+        .hp-bar, .mana-bar {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        /* Health bar fill with red gradient */
+        .hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ff0000);
+            transition: width 0.3s ease;
+        }
+        
+        /* Mana bar fill with blue gradient */
+        .mana-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4444ff, #0000ff);
+            transition: width 0.3s ease;
+        }
+        
+        /* ============= GAME LOG ============= */
+        /* Terminal-style log for game events */
+        .log {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            height: 150px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        /* ============= LOG MESSAGE TYPES ============= */
+        /* Special styling for different types of log messages */
+        .lore {
+            color: #FFD700 !important;
+            font-style: italic;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 3px 6px;
+            border-radius: 3px;
+            border-left: 3px solid #FFD700;
+        }
+        
+        /* ============= UTILITY CLASSES ============= */
+        /* Hide elements when not contextually relevant */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 
+    ===============================================
+    MAIN GAME CONTAINER (Central UI organization)
+    =============================================== 
+    -->
+    <div class="game-container">
+        
+        <!-- ============= HEADER SECTION ============= -->
+        <!-- Game title and description for player orientation -->
+        <div class="header">
+            <h1><i class="fas fa-sword"></i> Adventure Quest <i class="fas fa-shield-alt"></i></h1>
+            <p>A Text-Based RPG Adventure</p>
+        </div>
+        
+        <!-- ============= GAME STATISTICS ============= -->
+        <!-- Core progression metrics displayed prominently -->
+        <div class="stats-panel">
+            <div class="stat-card">
+                <h3><i class="fas fa-chart-line"></i> Game Stats</h3>
+                <p>Score: <span id="score">0</span></p>
+                <p>Level: <span id="level">1</span></p>
+                <p>Lives: <span id="lives">3</span></p>
+                <p>Turn: <span id="turn-counter">0</span>/150</p>
+                <p>Depth: <span id="depth-display">0</span>/10</p>
+            </div>
+        </div>
+        
+        <!-- ============= CHARACTER STATUS ============= -->
+        <!-- Player character information and vital statistics -->
+        <div class="character-panel">
+            <h3><i class="fas fa-user-shield"></i> Your Character</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <!-- HP display with dynamic current/max values -->
+                    <p>HP: <span id="player-hp">80</span>/<span id="player-max-hp">80</span></p>
+                    <div class="hp-bar">
+                        <!-- Visual health bar that updates with character state -->
+                        <div class="hp-fill" id="player-hp-bar" style="width: 100%;"></div>
+                    </div>
+                    <!-- Mana display with dynamic current/max values -->
+                    <p>Mana: <span id="player-mana">40</span>/<span id="player-max-mana">40</span></p>
+                    <div class="mana-bar">
+                        <!-- Visual mana bar for spell casting resource -->
+                        <div class="mana-fill" id="player-mana-bar" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <!-- Combat attributes that affect gameplay mechanics -->
+                    <p><i class="fas fa-fist-raised"></i> Strength: <span id="player-strength">18</span></p>
+                    <p><i class="fas fa-wind"></i> Agility: <span id="player-agility">12</span></p>
+                    <!-- Combat mastery tracking for specialized training -->
+                    <p><i class="fas fa-sword"></i> Physical Mastery: <span id="physical-mastery">0</span></p>
+                    <p><i class="fas fa-magic"></i> Magical Mastery: <span id="magical-mastery">0</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ============= MAGICAL SHOP ============= -->
+        <!-- Upgrade shop for character enhancement -->
+        <div class="shop-panel" id="shop-panel" style="display: none;">
+            <h3><i class="fas fa-store"></i> Mystical Shop</h3>
+            <p><i class="fas fa-info-circle"></i> Spend your points on permanent upgrades!</p>
+            <div class="shop-grid">
+                <div class="shop-item">
+                    <h4><i class="fas fa-heart"></i> Health Boost</h4>
+                    <p>+20 Max HP</p>
+                    <p class="shop-price">Cost: 150 points</p>
+                    <button onclick="Shop.buyUpgrade('health')" class="shop-btn" id="shop-health">Buy</button>
+                </div>
+                <div class="shop-item">
+                    <h4><i class="fas fa-magic"></i> Mana Boost</h4>
+                    <p>+15 Max Mana</p>
+                    <p class="shop-price">Cost: 120 points</p>
+                    <button onclick="Shop.buyUpgrade('mana')" class="shop-btn" id="shop-mana">Buy</button>
+                </div>
+                <div class="shop-item">
+                    <h4><i class="fas fa-fist-raised"></i> Strength Training</h4>
+                    <p>+3 Strength</p>
+                    <p class="shop-price">Cost: 100 points</p>
+                    <button onclick="Shop.buyUpgrade('strength')" class="shop-btn" id="shop-strength">Buy</button>
+                </div>
+                <div class="shop-item">
+                    <h4><i class="fas fa-wind"></i> Agility Training</h4>
+                    <p>+3 Agility</p>
+                    <p class="shop-price">Cost: 100 points</p>
+                    <button onclick="Shop.buyUpgrade('agility')" class="shop-btn" id="shop-agility">Buy</button>
+                </div>
+                <div class="shop-item">
+                    <h4><i class="fas fa-shield-alt"></i> Combat Mastery</h4>
+                    <p>+2 to both masteries</p>
+                    <p class="shop-price">Cost: 200 points</p>
+                    <button onclick="Shop.buyUpgrade('mastery')" class="shop-btn" id="shop-mastery">Buy</button>
+                </div>
+                <div class="shop-item">
+                    <h4><i class="fas fa-heart-broken"></i> Extra Life</h4>
+                    <p>+1 Life (Max 5)</p>
+                    <p class="shop-price">Cost: 500 points</p>
+                    <button onclick="Shop.buyUpgrade('life')" class="shop-btn" id="shop-life">Buy</button>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button onclick="Shop.closeShop()" class="shop-btn shop-close">Close Shop</button>
+            </div>
+        </div>
+        
+        <!-- ============= ENEMY INFORMATION ============= -->
+        <!-- Combat opponent details (hidden when not in battle) -->
+        <div class="enemy-panel" id="enemy-panel">
+            <h3><i class="fas fa-skull"></i> Current Enemy</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <!-- Dynamic enemy name based on encounter type -->
+                    <p><span id="enemy-name">Goblin</span></p>
+                    <!-- Enemy health with current/max display for tactical info -->
+                    <p>HP: <span id="enemy-hp">30</span>/<span id="enemy-max-hp">30</span></p>
+                    <div class="hp-bar">
+                        <!-- Visual enemy health bar for combat awareness -->
+                        <div class="hp-fill" id="enemy-hp-bar" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <!-- Enemy combat stats for strategic decision making -->
+                    <p><i class="fas fa-sword"></i> Attack: <span id="enemy-attack">10</span></p>
+                    <p><i class="fas fa-shield-alt"></i> Defense: <span id="enemy-defense">5</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ============= GAME NARRATIVE AREA ============= -->
+        <!-- Main story/situation display for immersive experience -->
+        <div class="game-area">
+            <div id="game-story">
+                <h3><i class="fas fa-dungeon"></i> Welcome to Adventure Quest!</h3>
+                <p>You find yourself at the entrance of a mysterious dungeon. Dark passages stretch before you, filled with unknown dangers and treasures.</p>
+                <p>What would you like to do?</p>
+            </div>
+        </div>
+        
+        <!-- ============= PLAYER CONTROLS ============= -->
+        <!-- Context-sensitive action buttons for game interaction -->
+        <div class="controls">
+            <!-- Core game action - always available -->
+            <button onclick="startNewGame()"><i class="fas fa-play"></i> Start New Game</button>
+            
+            <!-- Exploration actions - available when not in combat -->
+            <button onclick="exploreDungeon()" id="explore-btn"><i class="fas fa-search"></i> Explore</button>
+            <button onclick="restAtCamp()" id="rest-btn"><i class="fas fa-bed"></i> Rest</button>
+            <button onclick="Shop.openShop()" id="shop-btn"><i class="fas fa-store"></i> Shop</button>
+            
+            <!-- Combat actions - only shown during battles -->
+            <button onclick="attackEnemy()" id="attack-btn" class="hidden"><i class="fas fa-sword"></i> Attack</button>
+            <button onclick="castSpell()" id="spell-btn" class="hidden"><i class="fas fa-magic"></i> Cast Spell</button>
+            <button onclick="runAway()" id="run-btn" class="hidden"><i class="fas fa-running"></i> Run Away</button>
+        </div>
+        
+        <!-- ============= EVENT LOG ============= -->
+        <!-- Scrollable history of game events and outcomes -->
+        <div class="log" id="game-log">
+            <p style="color: #ffff00;">Game initialized. Click 'Start New Game' to begin your adventure!</p>
+        </div>
+        
+    </div>
+    
+    <!-- ============= JAVASCRIPT INTEGRATION ============= -->
+    <!-- Link to external game logic and state management -->
+    <script src="script.js"></script>
+</body>
+</html>
